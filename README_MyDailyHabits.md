@@ -79,8 +79,6 @@ When internet is available, changes are synchronized with the server (cloud data
 
 ## 6. App Mockup
 
-*(The mockup screenshots will be added by the user — e.g., designed in Figma or Sketch.)*
-
 Suggested Screens:
 1. **Home Screen:** List of habits with daily progress.
 2. **Add Habit Screen:** Form to create a new habit.
