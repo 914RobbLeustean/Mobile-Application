@@ -2,7 +2,7 @@
 //  HabitFlowApp.swift
 //  HabitFlow
 //
-//  Created by Robert Leustean on 30.10.2025.
+//  Main app entry point
 //
 
 import SwiftUI
@@ -11,7 +11,7 @@ import SwiftUI
 struct HabitFlowApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HabitListView()
         }
     }
 }
