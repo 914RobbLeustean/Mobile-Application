@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct HabitListView: View {
-    // Access to the view model (shared state)
-    @StateObject private var viewModel = HabitViewModel()
-    
+    // Access to the view model (injected from app level)
+    @EnvironmentObject var viewModel: HabitViewModel
+
     // Navigation state
     @State private var showingAddHabit = false
     
@@ -27,7 +27,7 @@ struct HabitListView: View {
                             emptyStateView
                         } else {
                             ForEach(viewModel.habits) { habit in
-                                NavigationLink(destination: HabitDetailView(habit: habit)) {
+                                NavigationLink(destination: HabitDetailView(habitId: habit.id)) {
                                     HabitCardView(habit: habit)
                                 }
                                 .buttonStyle(.plain)
@@ -43,6 +43,18 @@ struct HabitListView: View {
             }
             .navigationTitle("HabitFlow")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    // Network status indicator
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(viewModel.isOnline ? Color.green : Color.red)
+                            .frame(width: 8, height: 8)
+                        Text(viewModel.isOnline ? "Online" : "Offline")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     // Add button
                     Button {
@@ -57,10 +69,8 @@ struct HabitListView: View {
             }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
-                    .environmentObject(viewModel)
             }
         }
-        .environmentObject(viewModel)
     }
     
     // MARK: - Subviews

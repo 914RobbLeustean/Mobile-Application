@@ -10,34 +10,54 @@ import SwiftUI
 struct HabitDetailView: View {
     // Environment to access view model
     @EnvironmentObject var viewModel: HabitViewModel
-    
+
     // Environment to dismiss the view
     @Environment(\.dismiss) var dismiss
-    
-    // The habit to display
-    let habit: Habit
-    
+
+    // Store habit ID instead of the object to avoid SwiftData faults
+    let habitId: UUID
+
     // Navigation state
     @State private var showingEditSheet = false
     @State private var showingDeleteAlert = false
-    
+
+    // Computed property to get fresh habit from viewModel
+    private var habit: Habit? {
+        viewModel.getHabit(by: habitId)
+    }
+
     var body: some View {
+        Group {
+            if let habit = habit {
+                detailContent(for: habit)
+            } else {
+                // Habit was deleted, dismiss automatically
+                Text("Habit not found")
+                    .onAppear {
+                        dismiss()
+                    }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func detailContent(for habit: Habit) -> some View {
         ZStack {
             // Background
-            backgroundGradient
-            
+            backgroundGradient(for: habit)
+
             // Content
             ScrollView {
                 VStack(spacing: 24) {
                     // Header with icon
-                    headerSection
-                    
+                    headerSection(for: habit)
+
                     // Habit details
-                    detailsSection
-                    
+                    detailsSection(for: habit)
+
                     // Action buttons
-                    actionsSection
-                    
+                    actionsSection(for: habit)
+
                     Spacer(minLength: 40)
                 }
                 .padding()
@@ -56,7 +76,6 @@ struct HabitDetailView: View {
         }
         .sheet(isPresented: $showingEditSheet) {
             EditHabitView(habit: habit)
-                .environmentObject(viewModel)
         }
         .alert("Delete Habit?", isPresented: $showingDeleteAlert) {
             Button("Cancel", role: .cancel) { }
@@ -67,10 +86,10 @@ struct HabitDetailView: View {
             Text("Are you sure you want to delete '\(habit.name)'? This action cannot be undone.")
         }
     }
-    
+
     // MARK: - Subviews
-    
-    private var backgroundGradient: some View {
+
+    private func backgroundGradient(for habit: Habit) -> some View {
         LinearGradient(
             colors: [
                 habit.color.color.opacity(0.2),
@@ -82,8 +101,8 @@ struct HabitDetailView: View {
         )
         .ignoresSafeArea()
     }
-    
-    private var headerSection: some View {
+
+    private func headerSection(for habit: Habit) -> some View {
         VStack(spacing: 16) {
             // Large icon
             GlassIconBadge(
@@ -91,13 +110,13 @@ struct HabitDetailView: View {
                 color: habit.color.color,
                 size: 120
             )
-            
+
             // Habit name
             Text(habit.name)
                 .font(.title)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-            
+
             // Category badge
             HStack(spacing: 8) {
                 Image(systemName: habit.category.icon)
@@ -114,8 +133,8 @@ struct HabitDetailView: View {
         }
         .padding(.top, 20)
     }
-    
-    private var detailsSection: some View {
+
+    private func detailsSection(for habit: Habit) -> some View {
         VStack(spacing: 16) {
             // Description
             GlassCard {
@@ -123,23 +142,23 @@ struct HabitDetailView: View {
                     Label("Description", systemImage: "text.alignleft")
                         .font(.headline)
                         .foregroundStyle(.secondary)
-                    
+
                     Text(habit.description)
                         .font(.body)
                         .foregroundStyle(.primary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
+
             // Frequency
             GlassCard {
                 HStack {
                     Label("Frequency", systemImage: habit.frequency.icon)
                         .font(.headline)
                         .foregroundStyle(.secondary)
-                    
+
                     Spacer()
-                    
+
                     Text(habit.frequency.rawValue)
                         .font(.body)
                         .fontWeight(.semibold)
@@ -184,7 +203,7 @@ struct HabitDetailView: View {
         }
     }
     
-    private var actionsSection: some View {
+    private func actionsSection(for habit: Habit) -> some View {
         VStack(spacing: 12) {
             // Delete button
             Button(role: .destructive) {
@@ -216,10 +235,16 @@ struct HabitDetailView: View {
     }
     
     // MARK: - Actions
-    
+
     private func deleteHabit() {
-        viewModel.deleteHabit(id: habit.id)
+        // Dismiss immediately to avoid accessing deleted object
         dismiss()
+
+        // Then delete after a small delay to ensure view is dismissed
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            viewModel.deleteHabit(id: habitId)
+        }
     }
 }
 
@@ -227,7 +252,7 @@ struct HabitDetailView: View {
 
 #Preview {
     NavigationStack {
-        HabitDetailView(habit: Habit.sampleHabits[0])
+        HabitDetailView(habitId: Habit.sampleHabits[0].id)
             .environmentObject(HabitViewModel.preview)
     }
 }

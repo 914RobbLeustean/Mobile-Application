@@ -239,27 +239,24 @@ struct EditHabitView: View {
     }
     
     // MARK: - Actions
-    
+
     private func saveChanges() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
-        
+
         guard !trimmedName.isEmpty else {
             showingValidationAlert = true
             return
         }
-        
-        // Create updated habit with same ID and creation date
-        let updatedHabit = Habit(
-            id: habit.id,
-            name: trimmedName,
-            description: description,
-            category: selectedCategory,
-            color: selectedColor,
-            frequency: selectedFrequency,
-            createdDate: habit.createdDate
-        )
-        
-        viewModel.updateHabit(updatedHabit)
+
+        // Update the habit object directly (SwiftData managed object)
+        habit.name = trimmedName
+        habit.description = description
+        habit.category = selectedCategory
+        habit.color = selectedColor
+        habit.frequency = selectedFrequency
+        // Note: id and createdDate are preserved automatically
+
+        viewModel.updateHabit(habit)
         dismiss()
     }
 }

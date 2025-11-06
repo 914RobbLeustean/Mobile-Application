@@ -7,20 +7,23 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 /// Represents a single habit with all its properties
-struct Habit: Identifiable, Codable {
+/// Now persisted to local database using SwiftData and synced with server
+@Model
+class Habit {
     // Unique identifier for each habit (required for SwiftUI lists)
-    let id: UUID
-    
+    var id: UUID
+
     // Habit properties
     var name: String
-    var description: String
+    var habitDescription: String  // Renamed to avoid @Model reserved keyword
     var category: HabitCategory
     var color: HabitColor
     var frequency: HabitFrequency
     var createdDate: Date
-    
+
     /// Default initializer
     init(
         id: UUID = UUID(),
@@ -33,13 +36,22 @@ struct Habit: Identifiable, Codable {
     ) {
         self.id = id
         self.name = name
-        self.description = description
+        self.habitDescription = description
         self.category = category
         self.color = color
         self.frequency = frequency
         self.createdDate = createdDate
     }
+
+    // Computed property for backward compatibility
+    var description: String {
+        get { habitDescription }
+        set { habitDescription = newValue }
+    }
 }
+
+// Note: @Model macro provides Codable support automatically
+// JSON serialization is handled via HabitDTO in NetworkService
 
 // MARK: - Habit Category
 
