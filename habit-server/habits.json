@@ -1,0 +1,38 @@
+[
+  {
+    "description": "Take a relaxing 20-minute walk to unwind and reflect on the day.",
+    "createdDate": "2025-11-06T14:27:27Z",
+    "name": "Evening Walk",
+    "frequency": "monthly",
+    "category": "fitness",
+    "id": "B7A83496-4622-4761-ACA1-C1517EA76E27",
+    "color": "pink"
+  },
+  {
+    "category": "creative",
+    "frequency": "weekly",
+    "name": "Creative Writing",
+    "color": "pink",
+    "createdDate": "2025-11-06T14:27:27Z",
+    "id": "9FD37617-8421-42C3-8372-7E284FAEE927",
+    "description": "Write at least 500 words of creative content, stories, or journal entries."
+  },
+  {
+    "name": "Morning Meditation",
+    "id": "0BBE7B3A-DBE2-4EC0-9062-D87E84CFC09F",
+    "color": "red",
+    "frequency": "daily",
+    "category": "health",
+    "createdDate": "2025-11-06T14:54:38Z",
+    "description": "Cool off any thoughts by meditating 20 minutes"
+  },
+  {
+    "name": "TEST DB",
+    "description": "TEST DB1",
+    "frequency": "daily",
+    "color": "red",
+    "createdDate": "2025-11-06T15:00:49Z",
+    "category": "health",
+    "id": "AE8CFC77-5D2E-4363-A95D-12BEC910A735"
+  }
+]
